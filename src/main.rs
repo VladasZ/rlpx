@@ -6,14 +6,12 @@
 
 extern crate core;
 
+use std::mem::{size_of, transmute};
+
 use concat_arrays::concat_arrays;
 use hex::decode;
-use rand::rngs::OsRng;
-use rand::Rng;
-use secp256k1::ecdh::SharedSecret;
-use secp256k1::{Message, PublicKey, Secp256k1};
-use std::mem::transmute;
-use std::mem::size_of;
+use rand::{rngs::OsRng, Rng};
+use secp256k1::{ecdh::SharedSecret, Message, PublicKey, Secp256k1};
 
 // Constants for the handshake.
 mod consts {
@@ -22,8 +20,8 @@ mod consts {
     pub const sskLen: u32 = 16;
     // ecies.MaxSharedKeyLength(pubKey) / 2
     pub const sigLen: usize = SignatureLength; // elliptic S256
-pub const pubLen: usize = 64; // 512 bit pubkey in uncompressed representation without format byte
-pub const shaLen: usize = 32; // hash length (for nonce etc)
+    pub const pubLen: usize = 64; // 512 bit pubkey in uncompressed representation without format byte
+    pub const shaLen: usize = 32; // hash length (for nonce etc)
 
     pub const eciesOverhead: u32 = 65 /* pubkey */ + 16 /* IV */ + 32 /* MAC */;
 }
@@ -47,8 +45,8 @@ struct authMsgV4 {
 struct authRespV4 {
     RandomPubkey: [u8; pubLen],
     Nonce: [u8; shaLen],
-    Version: u32, // // Ignore additional fields (forward-compatibility)
-    // Rest []rlp.RawValue `rlp:"tail"`
+    Version: u32, /* // Ignore additional fields (forward-compatibility)
+                   * Rest []rlp.RawValue `rlp:"tail"` */
 }
 
 fn make_auth(remote_pk: &PublicKey) -> authMsgV4 {
@@ -106,5 +104,4 @@ fn main() {
     dbg!(auth);
 
     dbg!(size_of::<authMsgV4>());
-
 }
