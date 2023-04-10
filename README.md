@@ -1,10 +1,12 @@
 # rlpx
 
-Implementation of RPLx protocol.
+Implementation of RPLx protocol. `geth` is used as a test node.
 
 ## Dependencies
 
-You need to install Rust and Go.
+Rust: https://rustup.rs/
+
+Go: https://go.dev/doc/install 1.20 minumum
 
 ## Build
 
