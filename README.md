@@ -36,7 +36,7 @@ make test
 ```
 
 Successful test output example:
-```json lines
+```bash
 Geth node started.
 NodeConnection {
     public_key: "cc3a313d9894d23fac7decfd268bb052887c415dea339c301c053548ac30243be32d78898c2055f2a2a934638396f6a5906e732da67ab4116a8b13f0c85cc63e",
