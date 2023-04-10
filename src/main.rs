@@ -7,8 +7,9 @@ mod test;
 use parity_crypto::publickey::{Generator, KeyPair, Public, Random};
 
 use crate::{geth::run_geth, handshake::Handshake, node_connection::NodeConnection};
-use std::str::FromStr;
+use std::{env, str::FromStr};
 use tokio::{io::AsyncReadExt, net::TcpStream};
+use url::Url;
 
 /// Perform handshake with remote node.
 /// If [`NodeConnection`] is not specified
@@ -58,5 +59,15 @@ async fn handshake(conn: Option<NodeConnection>) -> Result<(), String> {
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
-    handshake(None).await
+    let args: Vec<String> = env::args().collect();
+
+    // parse enode URL
+    let connection = match args.get(1) {
+        Some(enode) => Some(NodeConnection::try_from(
+            Url::parse(enode).map_err(|e| e.to_string())?,
+        )?),
+        None => None,
+    };
+
+    handshake(connection).await
 }
