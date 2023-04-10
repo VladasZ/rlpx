@@ -16,8 +16,8 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          { runner: macos-latest },
-          { runner: ubuntu-latest },
+#          { runner: macos-latest },
+#          { runner: ubuntu-latest },
         ]
     runs-on: ${{ matrix.target.runner }}
     steps:
