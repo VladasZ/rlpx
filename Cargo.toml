@@ -6,13 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-concat-arrays = "0.1.2"
-hex = "0.4.3"
-xor = "1.4.5"
-rand = "0.8.5"
-secp256k1 = { version = "0.27.0", features = ["rand", "recovery", "bitcoin_hashes"] }
-
 rlp = "0.5.2"
-p256 = "0.13.0"
-
-libes = { version = "0.9.1", features = ["ECIES-MAC"] }
+rand = "0.8.5"
+parity-crypto = { version = "0.9.0", features = ["publickey"] }
