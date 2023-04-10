@@ -1,9 +1,8 @@
 
 all: rlpx
 
-rlpx:
+rlpx: 
 	cargo build
-
 
 ifeq ($(OS),Windows_NT)
 geth: geth-win

@@ -18,7 +18,7 @@ jobs:
         target: [
           { runner: macos-latest },
           { runner: ubuntu-latest },
-          { runner: windows-latest },
+#          { runner: windows-latest },
         ]
     runs-on: ${{ matrix.target.runner }}
     steps:

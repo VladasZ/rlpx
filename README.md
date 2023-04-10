@@ -2,6 +2,13 @@
 
 Implementation of RPLx protocol. `geth` is used as a test node.
 
+[BUILD]: https://github.com/vladasz/rlpx/actions/workflows/ci.yml/badge.svg
+[LBUILD]: https://github.com/vladasz/rlpx/actions/workflows/ci.yml
+
+macOS and linux supported:
+
+[![BUILD][BUILD]][LBUILD]
+
 ## Dependencies
 
 Rust: https://rustup.rs/
@@ -53,7 +60,7 @@ RemoteAck {
 
 ### Manual test:
 
-You can manually run `geth `test node with:
+You can manually run `geth` test node with:
 ```bash
 make run-geth
 ```
