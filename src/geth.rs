@@ -1,5 +1,6 @@
 //! Run `geth` as a test node
 
+use crate::node_connection_info::NodeConnectionInfo;
 use log::error;
 use std::process::Stdio;
 use tokio::{
@@ -9,13 +10,6 @@ use tokio::{
     sync::mpsc::channel,
 };
 use url::Url;
-
-#[derive(Debug)]
-pub struct NodeConnectionInfo {
-    pub public_key: String,
-    pub ip: String,
-    pub port: u16,
-}
 
 /// Start `geth` P2P node and parse its output
 /// Returns [`Child`] process and P2P [`NodeConnectionInfo`]
@@ -55,11 +49,5 @@ pub async fn run_geth() -> Result<(Child, NodeConnectionInfo), String> {
 
     let enode = Url::parse(enode).map_err(|e| e.to_string())?;
 
-    let connection = NodeConnectionInfo {
-        public_key: enode.username().to_string(),
-        ip: enode.host().ok_or("Failed to get geth IP")?.to_string(),
-        port: enode.port().ok_or("Failed to get geth port")?,
-    };
-
-    Ok((child, connection))
+    Ok((child, NodeConnectionInfo::try_from(enode)?))
 }
