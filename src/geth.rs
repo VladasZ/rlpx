@@ -1,19 +1,19 @@
 //! Run `geth` as a test node
 
-use crate::node_connection_info::NodeConnectionInfo;
+use crate::node_connection::NodeConnection;
 use log::error;
 use std::process::Stdio;
 use tokio::{
     io::{AsyncBufReadExt, BufReader},
-    process::{Child, Command},
+    process::Command,
     spawn,
     sync::mpsc::channel,
 };
 use url::Url;
 
 /// Start `geth` P2P node and parse its output
-/// Returns [`Child`] process and P2P [`NodeConnectionInfo`]
-pub async fn run_geth() -> Result<(Child, NodeConnectionInfo), String> {
+/// Returns [`Child`] process and P2P [`NodeConnection`]
+pub async fn run_geth() -> Result<NodeConnection, String> {
     let mut child = Command::new("make")
         .arg("run-geth")
         .stderr(Stdio::piped())
@@ -49,5 +49,7 @@ pub async fn run_geth() -> Result<(Child, NodeConnectionInfo), String> {
 
     let enode = Url::parse(enode).map_err(|e| e.to_string())?;
 
-    Ok((child, NodeConnectionInfo::try_from(enode)?))
+    println!("Geth node started.");
+
+    Ok(NodeConnection::try_from(enode)?.set_child(child))
 }

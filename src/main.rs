@@ -1,18 +1,23 @@
 mod geth;
 mod handshake;
-mod node_connection_info;
+mod node_connection;
 mod remote_ack;
 mod test;
 
 use parity_crypto::publickey::{Generator, KeyPair, Public, Random};
 
-use crate::{geth::run_geth, handshake::Handshake};
+use crate::{geth::run_geth, handshake::Handshake, node_connection::NodeConnection};
 use std::str::FromStr;
 use tokio::{io::AsyncReadExt, net::TcpStream};
 
-#[tokio::main]
-async fn main() -> Result<(), String> {
-    let (mut geth, connection) = run_geth().await?;
+/// Perform handshake with remote node.
+/// If [`NodeConnection`] is not specified
+/// it will start geth and use it
+async fn handshake(conn: Option<NodeConnection>) -> Result<(), String> {
+    let mut connection = match conn {
+        Some(conn) => conn,
+        None => run_geth().await?,
+    };
 
     println!("{connection:#?}");
 
@@ -46,7 +51,12 @@ async fn main() -> Result<(), String> {
     println!("Handshake successful:");
     println!("{remote_ack:#?}");
 
-    geth.kill().await.map_err(|e| e.to_string())?;
+    connection.kill().await?;
 
     Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<(), String> {
+    handshake(None).await
 }

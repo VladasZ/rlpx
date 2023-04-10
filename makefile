@@ -10,3 +10,6 @@ geth:
 
 run-geth:
 	go-ethereum/build/bin/geth --goerli
+
+test:
+	cargo test -- --show-output

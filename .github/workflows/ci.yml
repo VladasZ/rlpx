@@ -16,8 +16,8 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-#          { runner: macos-latest },
-#          { runner: ubuntu-latest },
+          { runner: macos-latest },
+          { runner: ubuntu-latest },
         ]
     runs-on: ${{ matrix.target.runner }}
     steps:
@@ -30,3 +30,6 @@ jobs:
 
       - name: Build geth
         run: make geth
+
+      - name: Test
+        run: make test
