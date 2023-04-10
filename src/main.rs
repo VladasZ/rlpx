@@ -40,7 +40,7 @@ fn main() -> Result<(), String> {
         .decode_ack(ack.as_slice())
         .map_err(|e| e.to_string())?;
 
-    dbg!(&remote_ack);
+    println!("{remote_ack:#?}");
 
     Ok(())
 }
