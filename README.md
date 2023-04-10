@@ -6,11 +6,11 @@ Implementation of RPLx protocol. `geth` is used as a test node.
 
 Rust: https://rustup.rs/
 
-Go: https://go.dev/doc/install 1.20 minumum
+Go: https://go.dev/doc/install 1.20 minimum
 
 ## Build
 
-Clone repository with submodules:
+Clone the repository with submodules:
 
 ```bash
 git clone --recursive https://github.com/VladasZ/rlpx.git
@@ -35,7 +35,7 @@ This test will run `geth` test node locally and perform handshake with it.
 make test
 ```
 
-Successful test output example:
+Example output of a successful test:
 ```bash
 Geth node started.
 NodeConnection {
@@ -53,18 +53,18 @@ RemoteAck {
 
 ### Manual test:
 
-You can run geth test node manually with:
+You can manually run `geth `test node with:
 ```bash
 make run-geth
 ```
 
-Look for enode URL. It looks similar to this:
+Look for the enode URL in the output. It will look something like this:
 `enode://8db16132ebd913b23538cc87a6d6c0c88ba9178164c0ec9e978b59e11909c7820039d29237c69f7e8c68a4ed786961332f0ab559f6f40f44be6f975181199dac@192.168.10.228:30303`
 
-Pass it as argument:
+While running `geth`, pass the enode URL as an argument in a separate terminal:
 
 ```bash
  cargo run -- enode://cc3a313d9894d23fac7decfd268bb052887c415dea339c301c053548ac30243be32d78898c2055f2a2a934638396f6a5906e732da67ab4116a8b13f0c85cc63e@127.0.0.1:30303
 ```
 
-Successful test output should be the same.
+The output of a successful test should be the same.
