@@ -1,8 +1,8 @@
 #![cfg(test)]
 
-use crate::handshake;
+use crate::{error::Result, handshake};
 
 #[tokio::test]
-async fn test() -> Result<(), String> {
+async fn test() -> Result<()> {
     handshake(None).await
 }

@@ -1,3 +1,4 @@
+mod error;
 mod geth;
 mod handshake;
 mod node_connection;
@@ -6,7 +7,12 @@ mod test;
 
 use parity_crypto::publickey::{Generator, KeyPair, Public, Random};
 
-use crate::{geth::run_geth, handshake::Handshake, node_connection::NodeConnection};
+use crate::{
+    error::{Result, RlpxError},
+    geth::run_geth,
+    handshake::Handshake,
+    node_connection::NodeConnection,
+};
 use std::{env, str::FromStr};
 use tokio::{io::AsyncReadExt, net::TcpStream};
 use url::Url;
@@ -14,7 +20,7 @@ use url::Url;
 /// Perform handshake with remote node.
 /// If [`NodeConnection`] is not specified
 /// it will start geth and use it
-async fn handshake(conn: Option<NodeConnection>) -> Result<(), String> {
+async fn handshake(conn: Option<NodeConnection>) -> Result<()> {
     let mut connection = match conn {
         Some(conn) => conn,
         None => run_geth().await?,
@@ -22,32 +28,22 @@ async fn handshake(conn: Option<NodeConnection>) -> Result<(), String> {
 
     println!("{connection:#?}");
 
-    let node_pk = Public::from_str(&connection.public_key).unwrap();
-    let local_kp: KeyPair = Random.generate();
+    let node_public_key =
+        Public::from_str(&connection.public_key).map_err(|_| RlpxError::FromHex)?;
+    let local_keypair: KeyPair = Random.generate();
 
-    let handshake = Handshake::with_remote_public_key(node_pk, local_kp);
+    let handshake = Handshake::with_remote_public_key(node_public_key, local_keypair);
 
-    let mut stream = TcpStream::connect(connection.socket())
-        .await
-        .map_err(|e| e.to_string())?;
+    let auth = handshake.encode_auth()?;
 
-    let auth = handshake.encode_auth().map_err(|e| e.to_string())?;
+    // Send auth packet
+    let mut stream = TcpStream::connect(connection.socket()).await?;
+    stream.try_write(&auth)?;
 
-    stream.try_write(&auth).map_err(|e| e.to_string())?;
-
-    let mut buf = [0; 1024];
-
-    let bytes_read = stream.read(&mut buf).await.map_err(|e| e.to_string())?;
-
-    let mut ack = Vec::with_capacity(bytes_read);
-
-    for i in 0..bytes_read {
-        ack.push(buf[i]);
-    }
-
-    let remote_ack = handshake
-        .decode_ack(ack.as_slice())
-        .map_err(|e| e.to_string())?;
+    // Receive ack packet
+    let mut ack_buf = [0; 1024];
+    let bytes_read = stream.read(&mut ack_buf).await?;
+    let remote_ack = handshake.decode_ack(&ack_buf[0..bytes_read])?;
 
     println!("Handshake successful:");
     println!("{remote_ack:#?}");
@@ -58,14 +54,12 @@ async fn handshake(conn: Option<NodeConnection>) -> Result<(), String> {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), String> {
+async fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
 
     // parse enode URL
     let connection = match args.get(1) {
-        Some(enode) => Some(NodeConnection::try_from(
-            Url::parse(enode).map_err(|e| e.to_string())?,
-        )?),
+        Some(enode) => Some(NodeConnection::try_from(Url::parse(enode)?)?),
         None => None,
     };
 

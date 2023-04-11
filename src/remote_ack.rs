@@ -1,3 +1,4 @@
+use crate::error::RlpxError;
 use parity_crypto::publickey::{Message, Public};
 use rlp::Rlp;
 
@@ -11,14 +12,14 @@ pub struct RemoteAck {
 
 /// Parse from RLP encoded buffer
 impl TryFrom<&[u8]> for RemoteAck {
-    type Error = String;
+    type Error = RlpxError;
     fn try_from(ack: &[u8]) -> Result<Self, Self::Error> {
         let rlp = Rlp::new(&ack);
 
         Ok(RemoteAck {
-            ephemeral: rlp.val_at(0).map_err(|e| e.to_string())?,
-            nonce: rlp.val_at(1).map_err(|e| e.to_string())?,
-            protocol_version: rlp.val_at(2).map_err(|e| e.to_string())?,
+            ephemeral: rlp.val_at(0)?,
+            nonce: rlp.val_at(1)?,
+            protocol_version: rlp.val_at(2)?,
         })
     }
 }
